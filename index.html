@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markaz Rayhan Valley PRO · Suite</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --accent: #6366f1;
+            --accent2: #8b5cf6;
+            --glow: rgba(99,102,241,0.35);
+            --bg: #06080f;
+            --card: rgba(15,20,40,0.85);
+            --border: rgba(99,102,241,0.18);
+            --text: #e2e8f0;
+            --muted: #64748b;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ======== CANVAS PARTICLES ======== */
+        #particles-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ======== AURORA BG ======== */
+        .aurora {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.18;
+            animation: drift 18s ease-in-out infinite alternate;
+        }
+        .aurora-blob:nth-child(1) { width: 600px; height: 600px; background: #6366f1; top: -200px; left: -100px; animation-delay: 0s; }
+        .aurora-blob:nth-child(2) { width: 500px; height: 500px; background: #8b5cf6; bottom: -150px; right: -100px; animation-delay: -6s; }
+        .aurora-blob:nth-child(3) { width: 400px; height: 400px; background: #06b6d4; top: 40%; left: 40%; animation-delay: -12s; }
+
+        @keyframes drift {
+            0% { transform: translate(0,0) scale(1); }
+            50% { transform: translate(40px, 30px) scale(1.08); }
+            100% { transform: translate(-30px, 50px) scale(0.95); }
+        }
+
+        /* ======== GRID OVERLAY ======== */
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* ======== GLASS CARD ======== */
+        .glass {
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.4s, box-shadow 0.4s, transform 0.3s;
+        }
+        .glass::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(99,102,241,0.06) 0%, transparent 60%);
+            pointer-events: none;
+            border-radius: inherit;
+        }
+        .glass:hover {
+            border-color: rgba(99,102,241,0.4);
+            box-shadow: 0 0 40px var(--glow), 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        /* ======== NEON GLOW TEXT ======== */
+        .neon-text {
+            background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 50%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ======== BUTTONS ======== */
+        .btn-primary {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white; font-weight: 600; padding: 10px 20px;
+            border-radius: 12px; border: none; cursor: pointer;
+            position: relative; overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+        }
+        .btn-primary::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, #818cf8, #a78bfa);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .btn-primary:hover::before { opacity: 1; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.5); }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-primary span, .btn-primary svg { position: relative; z-index: 1; }
+
+        .btn-danger {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white; font-weight: 600; padding: 10px 20px;
+            border-radius: 12px; border: none; cursor: pointer;
+            transition: all 0.3s; box-shadow: 0 4px 20px rgba(239,68,68,0.3);
+        }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(239,68,68,0.5); }
+
+        .btn-success {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white; font-weight: 600; padding: 10px 20px;
+            border-radius: 12px; border: none; cursor: pointer;
+            transition: all 0.3s; box-shadow: 0 4px 20px rgba(16,185,129,0.3);
+        }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(16,185,129,0.5); }
+
+        .btn-ghost {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: rgba(255,255,255,0.06); color: var(--text); font-weight: 600;
+            padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer; transition: all 0.3s;
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,0.12); border-color: rgba(99,102,241,0.4); transform: translateY(-2px); }
+
+        /* ======== INPUTS ======== */
+        input[type="text"], input[type="password"], input[type="tel"], select {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(99,102,241,0.25);
+            color: white;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s;
+            width: 100%;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.2), 0 4px 15px rgba(99,102,241,0.15);
+            transform: translateY(-1px);
+            background: rgba(99,102,241,0.06);
+        }
+        input::placeholder { color: var(--muted); }
+
+        /* ======== SIDEBAR ======== */
+        .sidebar-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px; border-radius: 12px;
+            color: var(--muted); font-weight: 500; font-size: 14px;
+            cursor: pointer; border: none; background: none; width: 100%;
+            transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+            position: relative; overflow: hidden;
+        }
+        .sidebar-item::before {
+            content: ''; position: absolute; left: 0; top: 15%; bottom: 15%;
+            width: 3px; background: #6366f1; border-radius: 0 4px 4px 0;
+            transform: scaleY(0); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        .sidebar-item:hover { color: white; background: rgba(99,102,241,0.1); transform: translateX(4px); }
+        .sidebar-item.active { color: #a5b4fc; background: rgba(99,102,241,0.15); }
+        .sidebar-item.active::before { transform: scaleY(1); }
+
+        /* ======== ANIMATIONS ======== */
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(24px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.92); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideRight {
+            0% { opacity: 0; transform: translateX(-20px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-12px) rotate(2deg); }
+            66% { transform: translateY(-6px) rotate(-2deg); }
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(99,102,241,0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(99,102,241,0); }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(99,102,241,0); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes borderGlow {
+            0%,100% { box-shadow: 0 0 5px rgba(99,102,241,0.3); }
+            50% { box-shadow: 0 0 20px rgba(99,102,241,0.7), 0 0 40px rgba(139,92,246,0.4); }
+        }
+        @keyframes rotateIn {
+            0% { opacity: 0; transform: rotate(-10deg) scale(0.8); }
+            100% { opacity: 1; transform: rotate(0) scale(1); }
+        }
+        @keyframes waveIn {
+            0% { clip-path: circle(0% at 50% 50%); }
+            100% { clip-path: circle(150% at 50% 50%); }
+        }
+        @keyframes rowSlide {
+            0% { opacity: 0; transform: translateX(-30px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        .animate-fade-up { animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) forwards; }
+        .animate-fade-in { animation: fadeInScale 0.4s cubic-bezier(0.4,0,0.2,1) forwards; }
+        .animate-slide-right { animation: slideRight 0.4s cubic-bezier(0.4,0,0.2,1) forwards; }
+        .animate-float { animation: float 5s ease-in-out infinite; }
+        .animate-pulse-ring { animation: pulse-ring 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+
+        /* Staggered children */
+        .stagger > * { opacity: 0; animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) forwards; }
+        .stagger > *:nth-child(1) { animation-delay: 0.05s; }
+        .stagger > *:nth-child(2) { animation-delay: 0.12s; }
+        .stagger > *:nth-child(3) { animation-delay: 0.19s; }
+        .stagger > *:nth-child(4) { animation-delay: 0.26s; }
+        .stagger > *:nth-child(5) { animation-delay: 0.33s; }
+        .stagger > *:nth-child(6) { animation-delay: 0.40s; }
+
+        /* Shimmer skeleton */
+        .shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(99,102,241,0.08) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% auto;
+            animation: shimmer 2s linear infinite;
+        }
+
+        /* Logo badge */
+        .logo-badge {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 14px;
+            padding: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .logo-badge::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(255,255,255,0.2), transparent 30%);
+            animation: rotate 4s linear infinite;
+        }
+        @keyframes rotate { to { transform: rotate(360deg); } }
+
+        /* Stat cards */
+        .stat-card { transition: all 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .stat-card:hover { transform: translateY(-8px) scale(1.02); }
+
+        /* Table rows */
+        .student-row {
+            animation: rowSlide 0.4s cubic-bezier(0.4,0,0.2,1) both;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .student-row:hover { background: rgba(99,102,241,0.06); transform: translateX(4px); }
+
+        /* Progress bar */
+        .progress-bar {
+            height: 4px;
+            border-radius: 9999px;
+            background: rgba(255,255,255,0.08);
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4);
+            background-size: 200% auto;
+            animation: shimmer 3s linear infinite;
+        }
+
+        /* Modal */
+        #modal { backdrop-filter: blur(16px); }
+        #modal .modal-card { animation: fadeInScale 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+
+        /* Ripple effect */
+        .ripple { position: relative; overflow: hidden; }
+        .ripple-wave {
+            position: absolute; border-radius: 50%;
+            transform: scale(0); animation: rippleAnim 0.6s linear;
+            background: rgba(255,255,255,0.2); pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex; align-items: center;
+            padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .badge-blue { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 10px; }
+
+        /* Login page */
+        #loginPage { transition: opacity 0.5s ease; }
+
+        /* Tab section transition */
+        .tab-section { transition: opacity 0.3s ease; }
+
+        /* Search glow */
+        #search:focus { animation: borderGlow 2s ease-in-out infinite; }
+
+        /* Counter */
+        .counter { font-family: 'JetBrains Mono', monospace; }
+
+        /* Tooltip */
+        [data-tooltip] { position: relative; }
+        [data-tooltip]::after {
+            content: attr(data-tooltip);
+            position: absolute; bottom: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            background: rgba(15,20,40,0.95); color: white;
+            padding: 5px 10px; border-radius: 8px; font-size: 11px;
+            white-space: nowrap; pointer-events: none; opacity: 0;
+            transition: all 0.2s; border: 1px solid var(--border);
+        }
+        [data-tooltip]:hover::after { opacity: 1; transform: translateX(-50%) scale(1); }
+
+        /* Photo drop zone */
+        .drop-zone { transition: all 0.3s; }
+        .drop-zone:hover { border-color: #6366f1; background: rgba(99,102,241,0.05); transform: scale(1.01); }
+
+        /* Sidebar scroll */
+        aside { position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+
+        /* Card gradient borders */
+        .grad-border {
+            position: relative;
+            border-radius: 1.25rem;
+        }
+        .grad-border::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(135deg, rgba(99,102,241,0.5), rgba(139,92,246,0.3), rgba(6,182,212,0.3));
+            border-radius: inherit;
+            z-index: -1;
+        }
+
+        /* Notification dot */
+        .notif-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 0 2px rgba(16,185,129,0.3);
+            animation: pulse-ring 2s infinite;
+            display: inline-block;
+        }
+
+        /* Search result card entrance */
+        #searchResult > div {
+            animation: fadeUp 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+        }
+
+        /* Hover lift for action buttons in search */
+        .action-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px; border-radius: 10px; font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: all 0.25s;
+            border: 1px solid transparent;
+        }
+        .action-btn:hover { transform: translateY(-3px); }
+        .action-btn-blue { background: rgba(99,102,241,0.15); color: #a5b4fc; border-color: rgba(99,102,241,0.3); }
+        .action-btn-blue:hover { background: #6366f1; color: white; box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+        .action-btn-gray { background: rgba(255,255,255,0.06); color: #94a3b8; border-color: rgba(255,255,255,0.1); }
+        .action-btn-gray:hover { background: rgba(255,255,255,0.12); color: white; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .action-btn-red { background: rgba(239,68,68,0.1); color: #fca5a5; border-color: rgba(239,68,68,0.25); }
+        .action-btn-red:hover { background: #ef4444; color: white; box-shadow: 0 6px 20px rgba(239,68,68,0.4); }
+    </style>
+</head>
+<body>
+
+<!-- AURORA & PARTICLES -->
+<canvas id="particles-canvas"></canvas>
+<div class="aurora">
+    <div class="aurora-blob"></div>
+    <div class="aurora-blob"></div>
+    <div class="aurora-blob"></div>
+</div>
+<div class="grid-overlay"></div>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="loginPage" class="fixed inset-0 z-50 flex items-center justify-center p-6">
+    <div class="glass max-w-md w-full p-10 space-y-8 text-center animate-fade-up" style="border-color: rgba(99,102,241,0.3);">
+        
+        <!-- Logo -->
+        <div class="flex flex-col items-center gap-4">
+            <div class="logo-badge animate-float">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold neon-text tracking-tight">Markaz Rayhan Valley</h1>
+                <p class="text-sm text-slate-500 mt-1 tracking-widest uppercase font-medium">Management Suite PRO</p>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-3">
+            <div class="flex-1 h-px bg-gradient-to-r from-transparent to-indigo-500/30"></div>
+            <span class="text-xs text-slate-600 uppercase tracking-widest">Secure Login</span>
+            <div class="flex-1 h-px bg-gradient-to-l from-transparent to-indigo-500/30"></div>
+        </div>
+
+        <!-- Form -->
+        <form onsubmit="event.preventDefault(); login();" class="space-y-5 text-left">
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Username</label>
+                <div class="relative">
+                    <input id="user" type="text" placeholder="Type username" style="padding-left:44px">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Password</label>
+                <div class="relative">
+                    <input id="pass" type="password" placeholder="Type password" style="padding-left:44px">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary w-full py-4 text-base mt-2 ripple" style="border-radius:14px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                <span>Access Dashboard</span>
+            </button>
+        </form>
+
+        <p class="text-xs text-slate-600 uppercase tracking-widest font-bold border-t border-slate-800/60 pt-6">
+            <span class="notif-dot mr-2"></span>Designed by Fasih
+        </p>
+    </div>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboard" class="hidden relative z-10 min-h-screen flex flex-col md:flex-row">
+
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 flex flex-col p-6 z-20" style="background: rgba(8,12,28,0.9); border-right: 1px solid rgba(99,102,241,0.12);">
+
+        <!-- Brand -->
+        <div class="flex items-center gap-3 mb-10 animate-slide-right">
+            <div class="logo-badge" style="padding:8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <div>
+                <p class="font-bold text-white text-sm leading-tight">Rayhan Valley</p>
+                <p class="text-xs font-semibold" style="color:#818cf8;">PRO Suite</p>
+            </div>
+            <div class="ml-auto notif-dot" data-tooltip="System Online"></div>
+        </div>
+
+        <!-- Nav -->
+        <nav class="space-y-1 flex-grow stagger">
+            <button onclick="switchTab('home',this)" class="sidebar-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </button>
+            <button onclick="switchTab('add',this)" class="sidebar-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                Add Student
+            </button>
+            <button onclick="switchTab('list',this)" class="sidebar-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Student List
+            </button>
+            <button onclick="switchTab('settings',this)" class="sidebar-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M16.24 7.76a6 6 0 0 1 0 8.48M12 22V12M12 12a4 4 0 0 1 0-8"/></svg>
+                Tools & Backup
+            </button>
+        </nav>
+
+        <!-- Logout -->
+        <button onclick="logout()" class="flex items-center gap-3 p-3 rounded-xl mt-6 group transition-all" style="color:#f87171;" onmouseenter="this.style.background='rgba(239,68,68,0.1)'" onmouseleave="this.style.background='transparent'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform 0.3s" class="group-hover:-translate-x-1"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span class="font-semibold text-sm">Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-6 md:p-10 overflow-y-auto relative">
+
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div class="animate-fade-up">
+                <h1 id="tabTitle" class="text-3xl font-bold neon-text tracking-tight">Dashboard Overview</h1>
+                <p id="tabDesc" class="text-slate-500 mt-1 text-sm">Quick statistics and student lookup.</p>
+            </div>
+
+            <!-- Total students pill -->
+            <div class="glass px-6 py-4 flex items-center gap-5 animate-fade-up" style="animation-delay:0.1s; border-color:rgba(99,102,241,0.3);">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Students</p>
+                    <p id="count" class="text-2xl font-bold counter" style="color:#a5b4fc;">0</p>
+                </div>
+                <div style="width:1px; height:40px; background:rgba(255,255,255,0.08);"></div>
+                <div style="background:rgba(99,102,241,0.15); border-radius:50%; padding:10px; color:#818cf8;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== HOME TAB ===== -->
+        <section id="sec-home" class="space-y-8 tab-section">
+
+            <!-- Search -->
+            <div class="glass p-8 animate-fade-up" style="animation-delay:0.15s;">
+                <label class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 block">Search Student by Admission Number</label>
+                <div class="flex gap-3">
+                    <div class="relative flex-grow">
+                        <input id="search" onkeyup="searchStudent()" placeholder="Type admission number e.g. 1001" style="padding-left:44px;">
+                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        </div>
+                    </div>
+                    <button class="btn-primary px-8 ripple" style="flex-shrink:0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <span>Search</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="searchResult" class="hidden"></div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 stagger">
+                <div class="glass p-7 stat-card" style="border-left: 3px solid #6366f1;">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Performance Index</p>
+                    <p class="text-4xl font-bold counter" style="color:#a5b4fc;">98.4%</p>
+                    <div class="progress-bar mt-5">
+                        <div class="progress-fill" id="perfBar" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="glass p-7 stat-card" style="border-left: 3px solid #10b981;">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Fees Collected</p>
+                    <p id="totalFees" class="text-4xl font-bold counter" style="color:#6ee7b7;">₹0</p>
+                    <p class="text-xs text-slate-600 mt-3">Cumulative total this session</p>
+                </div>
+                <div class="glass p-7 stat-card" style="border-left: 3px solid #f59e0b;">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Active Leaves</p>
+                    <p id="totalLeaves" class="text-4xl font-bold counter" style="color:#fcd34d;">0</p>
+                    <p class="text-xs text-slate-600 mt-3">Currently away or requested</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== ADD TAB ===== -->
+        <section id="sec-add" class="hidden tab-section">
+            <div class="glass p-8 md:p-10 max-w-2xl mx-auto">
+                <h3 class="font-bold text-xl text-white mb-8 flex items-center gap-3">
+                    <span style="background:rgba(99,102,241,0.2); color:#818cf8; padding:8px; border-radius:10px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                    </span>
+                    <span id="formHeading">Enroll New Student</span>
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 stagger">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Admission Number</label>
+                        <input id="adm" type="text" placeholder="1001">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Full Name</label>
+                        <input id="name" type="text" placeholder="Student Full Name">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Class / Grade</label>
+                        <input id="class" type="text" placeholder="X - A">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Phone Number</label>
+                        <input id="phone" type="tel" placeholder="+91 xxxxxxxxxx">
+                    </div>
+                </div>
+
+                <div class="space-y-1.5 mt-5">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Student Photo</label>
+                    <div class="drop-zone relative border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer" style="border-color: rgba(99,102,241,0.3);">
+                        <input type="file" id="photo" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <div id="photoPreviewArea">
+                            <div style="color:#6366f1; margin-bottom:12px;" class="animate-float">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+                            </div>
+                            <p class="text-sm font-semibold text-slate-300">Click to upload or drag and drop</p>
+                            <p class="text-xs text-slate-600 mt-1">Supports JPG, PNG (Max 1MB)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 mt-8">
+                    <button id="saveBtn" onclick="addStudent()" class="btn-success flex-grow py-4 text-base ripple" style="border-radius:14px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        <span>Save Student Data</span>
+                    </button>
+                    <button onclick="clearForm()" class="btn-ghost px-8 py-4 ripple" style="border-radius:14px;">Reset</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== LIST TAB ===== -->
+        <section id="sec-list" class="hidden tab-section">
+            <div class="glass overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left" style="font-size:13px;">
+                        <thead style="background:rgba(99,102,241,0.08); border-bottom: 1px solid rgba(99,102,241,0.15);">
+                            <tr>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">ADM</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">Student Details</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">Class</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">Contact</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTable" style="border-collapse: collapse;"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SETTINGS TAB ===== -->
+        <section id="sec-settings" class="hidden tab-section">
+            <div class="grid md:grid-cols-2 gap-6 stagger">
+
+                <div class="glass p-8 space-y-5">
+                    <div class="flex items-center gap-3">
+                        <span style="background:rgba(99,102,241,0.15); color:#818cf8; padding:8px; border-radius:10px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                        </span>
+                        <h3 class="font-bold text-lg text-white">Data Management</h3>
+                    </div>
+                    <p class="text-sm text-slate-500 leading-relaxed">Download entire database as portable JSON backup. Use to sync between devices or keep offline copies.</p>
+                    <div class="flex flex-col gap-3">
+                        <button onclick="downloadBackup()" class="btn-primary py-3 ripple">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Download Backup (.json)</span>
+                        </button>
+                        <label class="btn-ghost cursor-pointer py-3 ripple">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span>Restore from Backup</span>
+                            <input type="file" class="hidden" accept=".json" onchange="restoreData(event)">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="glass p-8 space-y-5">
+                    <div class="flex items-center gap-3">
+                        <span style="background:rgba(16,185,129,0.15); color:#6ee7b7; padding:8px; border-radius:10px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        </span>
+                        <h3 class="font-bold text-lg text-white">Bulk Import</h3>
+                    </div>
+                    <p class="text-sm text-slate-500 leading-relaxed">Onboard multiple students via Excel. Ensure headers are: <code style="background:rgba(16,185,129,0.1); color:#6ee7b7; padding:2px 6px; border-radius:6px;">adm</code>, <code style="background:rgba(16,185,129,0.1); color:#6ee7b7; padding:2px 6px; border-radius:6px;">name</code>, <code style="background:rgba(16,185,129,0.1); color:#6ee7b7; padding:2px 6px; border-radius:6px;">class</code>.</p>
+                    <label class="btn-success py-3 cursor-pointer ripple" style="display:flex; align-items:center; justify-content:center; gap:8px; border-radius:12px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M20 21H4"/></svg>
+                        <span>Select Excel File</span>
+                        <input type="file" class="hidden" accept=".xlsx,.xls,.csv" onchange="uploadExcel(event)">
+                    </label>
+                </div>
+
+                <div class="glass p-8 space-y-5 md:col-span-2">
+                    <div class="flex items-center gap-3">
+                        <span style="background:rgba(245,158,11,0.15); color:#fcd34d; padding:8px; border-radius:10px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                        </span>
+                        <h3 class="font-bold text-lg text-white">Document Customization</h3>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Certificate Style</label>
+                            <select id="template" class="w-full">
+                                <option value="1">Classic Professional</option>
+                                <option value="2">Modern Gradient</option>
+                                <option value="3">Gold Merit (Dark)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <p class="text-xs text-slate-600 italic">Affects all generated Certificates and Academic Reports from this session.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- ==================== MODAL ==================== -->
+<div id="modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6">
+    <div onclick="closeModal()" class="absolute inset-0" style="background:rgba(0,0,0,0.7);"></div>
+    <div class="modal-card glass max-w-sm w-full p-8 text-center space-y-5 relative" style="border-color:rgba(99,102,241,0.4);">
+        <div id="modalIcon" class="inline-flex p-4 rounded-full animate-float" style="background:rgba(99,102,241,0.15); color:#818cf8;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div>
+            <h3 id="modalTitle" class="text-2xl font-bold mb-2 text-white">Message</h3>
+            <p id="modalText" class="text-slate-400 text-sm leading-relaxed"></p>
+        </div>
+        <button onclick="closeModal()" class="btn-primary w-full py-3 ripple" style="border-radius:12px;">Continue</button>
+    </div>
+</div>
+
+<script>
+// ========== PARTICLES ==========
+(function() {
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    
+    for (let i = 0; i < 60; i++) {
+        particles.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            r: Math.random() * 1.5 + 0.5,
+            dx: (Math.random() - 0.5) * 0.4,
+            dy: (Math.random() - 0.5) * 0.4,
+            alpha: Math.random() * 0.5 + 0.1
+        });
+    }
+    
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(99,102,241,${p.alpha})`;
+            ctx.fill();
+            p.x += p.dx;
+            p.y += p.dy;
+            if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+        });
+        // Draw connecting lines
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i+1; j < particles.length; j++) {
+                const d = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+                if (d < 100) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(99,102,241,${0.07 * (1 - d/100)})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+
+// ========== RIPPLE EFFECT ==========
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('.ripple');
+    if (!target) return;
+    const rect = target.getBoundingClientRect();
+    const wave = document.createElement('span');
+    wave.className = 'ripple-wave';
+    const size = Math.max(rect.width, rect.height);
+    wave.style.cssText = `width:${size}px; height:${size}px; left:${e.clientX - rect.left - size/2}px; top:${e.clientY - rect.top - size/2}px;`;
+    target.appendChild(wave);
+    setTimeout(() => wave.remove(), 700);
+});
+
+// ========== CORE STATE ==========
+let students = JSON.parse(localStorage.getItem("students")) || {};
+const { jsPDF } = window.jspdf;
+let editId = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateDashboardStats();
+    
+    document.getElementById('photo').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById('photoPreviewArea').innerHTML = `
+                    <img src="${ev.target.result}" class="mx-auto mb-3 animate-fade-in" style="width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid #6366f1;">
+                    <p style="font-size:12px;color:#818cf8;font-weight:700;">✓ Photo Selected</p>
+                `;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Animate progress bar on load
+    setTimeout(() => {
+        const bar = document.getElementById('perfBar');
+        if(bar) bar.style.width = '98.4%';
+    }, 800);
+});
+
+// ========== COUNTER ANIMATION ==========
+function animateCounter(el, target, prefix='', suffix='') {
+    const start = 0;
+    const duration = 1000;
+    const startTime = performance.now();
+    function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const value = Math.round(start + (target - start) * ease);
+        el.textContent = prefix + value.toLocaleString() + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+}
+
+// ========== UI HELPERS ==========
+function showMessage(title, text, type='info') {
+    const modal = document.getElementById('modal');
+    const iconDiv = document.getElementById('modalIcon');
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalText').innerText = text;
+    
+    if (type === 'error') {
+        iconDiv.style.background = 'rgba(239,68,68,0.15)';
+        iconDiv.style.color = '#f87171';
+        iconDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+    } else {
+        iconDiv.style.background = 'rgba(99,102,241,0.15)';
+        iconDiv.style.color = '#818cf8';
+        iconDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+    }
+    modal.classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+}
+
+function save() {
+    localStorage.setItem("students", JSON.stringify(students));
+    updateDashboardStats();
+    renderTable();
+}
+
+// ========== NAVIGATION ==========
+function switchTab(tab, btn) {
+    const tabs = ['home','add','list','settings'];
+    const titles = {
+        home: ['Dashboard Overview', 'Quick statistics and student lookup.'],
+        add: [editId ? 'Update Student Profile' : 'Enroll New Student', 'Enter details and upload a photo.'],
+        list: ['Student Directory', 'Manage all registered students.'],
+        settings: ['System Tools', 'Backup, restore and import data.']
+    };
+    
+    tabs.forEach(t => {
+        const sec = document.getElementById(`sec-${t}`);
+        sec.classList.add('hidden');
+        sec.style.opacity = '0';
+    });
+    
+    const active = document.getElementById(`sec-${tab}`);
+    active.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        active.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+        active.style.opacity = '1';
+        active.style.transform = 'translateY(0)';
+    });
+    
+    document.getElementById('tabTitle').innerText = titles[tab][0];
+    document.getElementById('tabDesc').innerText = titles[tab][1];
+    
+    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+    
+    if (tab === 'list') renderTable();
+    if (tab === 'home') {
+        setTimeout(() => {
+            const bar = document.getElementById('perfBar');
+            if(bar) bar.style.width = '98.4%';
+        }, 300);
+    }
+}
+
+// ========== AUTH ==========
+function login() {
+    const u = document.getElementById('user').value.trim().toLowerCase();
+    const p = document.getElementById('pass').value.trim().toLowerCase();
+    if (u === "markaz rayhan valley" && p === "markaz rayhan valley is my home") {
+        const lp = document.getElementById('loginPage');
+        lp.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        lp.style.opacity = '0';
+        lp.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            lp.style.display = 'none';
+            const dash = document.getElementById('dashboard');
+            dash.classList.remove('hidden');
+            dash.style.opacity = '0';
+            requestAnimationFrame(() => {
+                dash.style.transition = 'opacity 0.5s ease';
+                dash.style.opacity = '1';
+            });
+        }, 600);
+    } else {
+        showMessage("Access Denied", "Incorrect credentials. Please check username and password.", "error");
+        document.getElementById('pass').style.borderColor = 'rgba(239,68,68,0.7)';
+        document.getElementById('pass').style.boxShadow = '0 0 0 3px rgba(239,68,68,0.2)';
+        setTimeout(() => {
+            document.getElementById('pass').style.borderColor = '';
+            document.getElementById('pass').style.boxShadow = '';
+        }, 2000);
+    }
+}
+
+function logout() { location.reload(); }
+
+// ========== STUDENT CRUD ==========
+function addStudent() {
+    const id = document.getElementById('adm').value.trim();
+    const name = document.getElementById('name').value.trim();
+    const cls = document.getElementById('class').value.trim();
+    const ph = document.getElementById('phone').value.trim();
+    const photoInput = document.getElementById('photo').files[0];
+
+    if (!id || !name) {
+        showMessage("Validation Error", "Admission number and Full Name are required.", "error");
+        return;
+    }
+
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.innerHTML = `<svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg><span>Saving...</span>`;
+
+    const processSave = (photoData = "") => {
+        const existing = students[id] || {};
+        students[id] = {
+            name, class: cls, phone: ph,
+            photo: photoData || existing.photo || "",
+            fees: existing.fees || 0,
+            attendance: existing.attendance || [],
+            leave: existing.leave || []
+        };
+        if (editId && editId !== id) delete students[editId];
+        save();
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg><span>Save Student Data</span>`;
+        }, 500);
+        showMessage("Success ✓", `${name}'s profile has been ${editId ? 'updated' : 'created'} successfully.`);
+        clearForm();
+        switchTab('home', document.querySelector('.sidebar-item'));
+    };
+
+    if (photoInput) {
+        const reader = new FileReader();
+        reader.onload = e => processSave(e.target.result);
+        reader.readAsDataURL(photoInput);
+    } else processSave("");
+}
+
+function searchStudent() {
+    const query = document.getElementById('search').value.trim().toLowerCase();
+    const container = document.getElementById('searchResult');
+    const foundId = Object.keys(students).find(id => id === query);
+    if (foundId) {
+        const s = students[foundId];
+        container.classList.remove('hidden');
+        container.innerHTML = `
+            <div class="glass p-8 flex flex-col md:flex-row gap-8 items-center" style="border-left:4px solid #6366f1; border-color-left:#6366f1;">
+                <div style="position:relative;">
+                    <div style="width:130px;height:130px;border-radius:16px;overflow:hidden;border:3px solid rgba(99,102,241,0.4);box-shadow:0 0 30px rgba(99,102,241,0.3);">
+                        ${s.photo ? `<img src="${s.photo}" style="width:100%;height:100%;object-fit:cover;">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(99,102,241,0.1);color:#6366f1;"><svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/><circle cx='12' cy='7' r='4'/></svg></div>`}
+                    </div>
+                    <div style="position:absolute;bottom:-4px;right:-4px;" class="notif-dot"></div>
+                </div>
+                <div style="flex:1;">
+                    <span class="badge badge-blue mb-3">Admission #${foundId}</span>
+                    <h2 style="font-size:2rem;font-weight:800;color:white;margin:6px 0;">${s.name}</h2>
+                    <p style="color:#64748b;font-size:14px;margin-bottom:20px;">${s.class || 'No Class'} &nbsp;·&nbsp; ${s.phone || 'No Contact'}</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                        <button onclick='generateID("${foundId}")' class="action-btn action-btn-blue ripple"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='2' y='7' width='20' height='14' rx='2' ry='2'/><path d='M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16'/></svg> ID Card</button>
+                        <button onclick='certificate("${foundId}")' class="action-btn action-btn-gray ripple"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><circle cx='12' cy='8' r='6'/><path d='M15.477 12.89 17 22l-5-3-5 3 1.523-9.11'/></svg> Certificate</button>
+                        <button onclick='markAttendance("${foundId}")' class="action-btn action-btn-gray ripple"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='3' y='4' width='18' height='18' rx='2' ry='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/><path d='m9 16 2 2 4-4'/></svg> Attendance</button>
+                        <button onclick='addFees("${foundId}")' class="action-btn action-btn-gray ripple"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><line x1='12' y1='1' x2='12' y2='23'/><path d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'/></svg> Fees</button>
+                        <button onclick='addLeave("${foundId}")' class="action-btn action-btn-gray ripple"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z'/></svg> Leave</button>
+                        <button onclick='deleteStudent("${foundId}")' class="action-btn action-btn-red ripple"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><polyline points='3 6 5 6 21 6'/><path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2'/></svg></button>
+                    </div>
+                </div>
+            </div>`;
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
+function renderTable() {
+    const tbody = document.getElementById('studentTable');
+    tbody.innerHTML = "";
+    const keys = Object.keys(students);
+    if (!keys.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="padding:40px;text-align:center;color:#475569;font-style:italic;">No students found. Add your first student to get started.</td></tr>`;
+        return;
+    }
+    keys.forEach((id, i) => {
+        const s = students[id];
+        const tr = document.createElement('tr');
+        tr.className = 'student-row';
+        tr.style.animationDelay = `${i * 0.05}s`;
+        tr.style.borderBottom = '1px solid rgba(99,102,241,0.06)';
+        tr.innerHTML = `
+            <td style="padding:16px 24px; font-family:'JetBrains Mono',monospace; color:#818cf8; font-weight:700;">#${id}</td>
+            <td style="padding:16px 24px;">
+                <div style="display:flex;align-items:center;gap:14px;">
+                    <div style="width:42px;height:42px;border-radius:10px;overflow:hidden;border:2px solid rgba(99,102,241,0.2);flex-shrink:0;">
+                        ${s.photo ? `<img src="${s.photo}" style="width:100%;height:100%;object-fit:cover;">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(99,102,241,0.1);color:#6366f1;font-size:16px;">👤</div>`}
+                    </div>
+                    <div>
+                        <div style="font-weight:700;color:#e2e8f0;">${s.name}</div>
+                        <div style="font-size:11px;color:#475569;">Student Record</div>
+                    </div>
+                </div>
+            </td>
+            <td style="padding:16px 24px; color:#64748b;">${s.class || '—'}</td>
+            <td style="padding:16px 24px; color:#64748b; font-size:13px;">${s.phone || '—'}</td>
+            <td style="padding:16px 24px;">
+                <button onclick="editMode('${id}')" style="background:rgba(99,102,241,0.12);color:#a5b4fc;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border:1px solid rgba(99,102,241,0.25);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#6366f1';this.style.color='white'" onmouseout="this.style.background='rgba(99,102,241,0.12)';this.style.color='#a5b4fc'">Edit Profile</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function updateDashboardStats() {
+    const arr = Object.values(students);
+    const countEl = document.getElementById('count');
+    const feesEl = document.getElementById('totalFees');
+    const leavesEl = document.getElementById('totalLeaves');
+    
+    animateCounter(countEl, arr.length);
+    const totalFees = arr.reduce((a,c) => a + (Number(c.fees)||0), 0);
+    animateCounter(feesEl, totalFees, '₹');
+    const leaves = arr.reduce((a,c) => a + (c.leave?.length||0), 0);
+    animateCounter(leavesEl, leaves);
+}
+
+// ========== CRUD HELPERS ==========
+function deleteStudent(id) {
+    if (confirm(`Delete student #${id}? This cannot be undone.`)) {
+        delete students[id];
+        save();
+        document.getElementById('searchResult').classList.add('hidden');
+        document.getElementById('search').value = '';
+        showMessage("Deleted", "Student record has been removed.");
+    }
+}
+
+function editMode(id) {
+    const s = students[id];
+    editId = id;
+    document.getElementById('adm').value = id;
+    document.getElementById('name').value = s.name;
+    document.getElementById('class').value = s.class || '';
+    document.getElementById('phone').value = s.phone || '';
+    document.getElementById('formHeading').innerText = 'Update Student Profile';
+    document.getElementById('saveBtn').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><span>Update Profile</span>`;
+    switchTab('add', document.querySelectorAll('.sidebar-item')[1]);
+}
+
+function clearForm() {
+    editId = null;
+    ['adm','name','class','phone'].forEach(id => document.getElementById(id).value = "");
+    document.getElementById('photo').value = "";
+    document.getElementById('formHeading').innerText = 'Enroll New Student';
+    document.getElementById('photoPreviewArea').innerHTML = `
+        <div style="color:#6366f1;margin-bottom:12px;" class="animate-float">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto" style="display:block;margin:0 auto;"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        </div>
+        <p style="font-size:14px;font-weight:600;color:#cbd5e1;">Click to upload or drag and drop</p>
+        <p style="font-size:12px;color:#475569;margin-top:4px;">Supports JPG, PNG (Max 1MB)</p>
+    `;
+    document.getElementById('saveBtn').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg><span>Save Student Data</span>`;
+}
+
+// ========== PDF GENERATORS ==========
+function generateID(id) {
+    const s = students[id];
+    if (!s) return;
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: [86, 54] });
+    doc.setFillColor(6, 8, 15);
+    doc.rect(0, 0, 86, 54, "F");
+    doc.setFillColor(99, 102, 241);
+    doc.rect(0, 0, 86, 14, "F");
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(9); doc.setFont("helvetica","bold");
+    doc.text("MARKAZ RAYHAN VALLEY", 43, 9, { align:"center" });
+    doc.setFillColor(20, 27, 55);
+    doc.roundedRect(6, 18, 24, 30, 2, 2, "F");
+    if (s.photo) { try { doc.addImage(s.photo, "JPEG", 7, 19, 22, 28); } catch(e) {} }
+    doc.setFontSize(6); doc.setTextColor(100,116,139); doc.text("STUDENT NAME", 36, 22);
+    doc.setTextColor(255,255,255); doc.setFontSize(10);
+    doc.text((s.name||"N/A").toUpperCase(), 36, 28);
+    doc.setFontSize(6); doc.setTextColor(100,116,139); doc.text("ADMISSION NO", 36, 36);
+    doc.setTextColor(165,180,252); doc.setFontSize(9); doc.text(`#${id}`, 36, 41);
+    doc.setFontSize(6); doc.setTextColor(100,116,139); doc.text("CLASS", 62, 36);
+    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.text(s.class || "-", 62, 41);
+    doc.save(`ID_${id}.pdf`);
+}
+
+function certificate(id) {
+    const s = students[id];
+    if (!s) return;
+    const style = document.getElementById('template').value;
+    const doc = new jsPDF("landscape");
+    const w = doc.internal.pageSize.getWidth();
+    const h = doc.internal.pageSize.getHeight();
+    if (style=="3") { doc.setFillColor(28,25,23); doc.rect(0,0,w,h,"F"); doc.setTextColor(234,179,8); }
+    else if (style=="2") { doc.setFillColor(248,250,252); doc.rect(0,0,w,h,"F"); doc.setTextColor(37,99,235); }
+    else { doc.setTextColor(30,41,59); }
+    doc.setFont("times","bold"); doc.setFontSize(40);
+    doc.text("CERTIFICATE OF EXCELLENCE", w/2, 50, { align:"center" });
+    doc.setFont("helvetica","normal"); doc.setFontSize(16);
+    doc.text("This is to certify that", w/2, 80, { align:"center" });
+    doc.setFont("times","italic"); doc.setFontSize(35);
+    doc.text(s.name, w/2, 110, { align:"center" });
+    doc.setFont("helvetica","normal"); doc.setFontSize(14);
+    doc.text(`Student of class ${s.class||'N/A'} has successfully demonstrated`, w/2, 130, { align:"center" });
+    doc.text("outstanding performance at Markaz Rayhan Valley.", w/2, 140, { align:"center" });
+    doc.setFontSize(12); doc.text(new Date().toLocaleDateString(), w/2, 170, { align:"center" });
+    doc.save(`Certificate_${id}.pdf`);
+}
+
+function markAttendance(id) {
+    if (!students[id].attendance) students[id].attendance = [];
+    const today = new Date().toLocaleDateString();
+    if (students[id].attendance.includes(today)) { showMessage("Attendance", "Already marked for today."); return; }
+    students[id].attendance.push(today);
+    save();
+    showMessage("Success ✓", "Attendance marked successfully.");
+}
+
+function addFees(id) {
+    const amount = prompt("Enter amount to add (₹):");
+    if (amount && !isNaN(amount)) {
+        students[id].fees = (Number(students[id].fees)||0) + Number(amount);
+        save();
+        showMessage("Fees Updated ✓", `Collected ₹${amount} from ${students[id].name}.`);
+    }
+}
+
+function addLeave(id) {
+    const reason = prompt("Enter reason for leave:");
+    if (reason) {
+        if (!students[id].leave) students[id].leave = [];
+        students[id].leave.push({ date: new Date().toLocaleDateString(), reason });
+        save();
+        showMessage("Leave Recorded ✓", "Leave has been logged in the system.");
+    }
+}
+
+// ========== BACKUP & EXCEL ==========
+function downloadBackup() {
+    const a = document.createElement('a');
+    a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(students, null, 2));
+    a.download = "MRV_Backup_" + new Date().toISOString().split('T')[0] + ".json";
+    document.body.appendChild(a);
+    a.click(); a.remove();
+}
+
+function restoreData(e) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+        try {
+            const imported = JSON.parse(ev.target.result);
+            if (confirm("This will overwrite existing data. Continue?")) {
+                students = imported;
+                save();
+                showMessage("Restored ✓", "Database updated from backup.");
+                renderTable();
+            }
+        } catch { showMessage("Error", "Not a valid JSON backup.", "error"); }
+    };
+    reader.readAsText(e.target.files[0]);
+}
+
+function uploadExcel(e) {
+    const reader = new FileReader();
+    reader.onload = evt => {
+        try {
+            const data = new Uint8Array(evt.target.result);
+            const wb = XLSX.read(data, { type:"array" });
+            const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            let count = 0;
+            json.forEach(row => {
+                if (row.adm) {
+                    students[row.adm] = { name: row.name||"Unknown", class: row.class||"", phone: row.phone||"", fees:0, attendance:[], leave:[], photo:"" };
+                    count++;
+                }
+            });
+            save();
+            showMessage("Import Complete ✓", `Successfully imported ${count} student records.`);
+            renderTable();
+        } catch { showMessage("Import Error", "Failed to parse file. Check headers.", "error"); }
+    };
+    reader.readAsArrayBuffer(e.target.files[0]);
+}
+</script>
+</body>
+</html>
